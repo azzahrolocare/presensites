@@ -123,6 +123,15 @@
         .corner-tr { top: 16px; right: 16px; border-width: 4px 4px 0 0; border-top-right-radius: 6px; }
         .corner-bl { bottom: 16px; left: 16px; border-width: 0 0 4px 4px; border-bottom-left-radius: 6px; }
         .corner-br { bottom: 16px; right: 16px; border-width: 0 4px 4px 0; border-bottom-right-radius: 6px; }
+
+        /* CSS TAMBAHAN: Memaksa area bayangan html5-qrcode menjadi persegi sempurna di tengah */
+        #reader__dashboard_section_csr button {
+            background-color: #0F5132 !important;
+            color: white !important;
+            border-radius: 8px !important;
+            padding: 6px 12px !important;
+            font-size: 12px !important;
+        }
     </style>
 </head>
 <body id="mainBody" class="bg-[#f8fafc] min-h-screen text-gray-800 antialiased flex flex-col justify-between overflow-x-hidden" onclick="onBodyClick()">
@@ -196,7 +205,7 @@
         </div>
 
         <!-- SCANNER BOX (PERSEGI 1:1 DENGAN UKURAN LEBIH BESAR & SIKU-SIKU PUTIH) -->
-        <div class="w-full max-w-[350px] aspect-square rounded-2xl overflow-hidden border-2 border-emerald-deep shadow-lg bg-black relative flex items-center justify-center">
+        <div class="w-full max-w-[320px] aspect-square rounded-2xl overflow-hidden border-2 border-emerald-deep shadow-lg bg-black relative flex items-center justify-center">
           <!-- Siku-siku Putih -->
           <div class="corner-bracket corner-tl"></div>
           <div class="corner-bracket corner-tr"></div>
@@ -555,19 +564,12 @@ function onCordovaReady() {
   }
 }
 
-// PERUBAHAN UTAMA: qrbox menggunakan fungsi callback untuk memastikan kotaknya selalu persegi sempurna (1:1)
+// PERUBAHAN UTAMA: Memaksa ukuran qrbox menggunakan ukuran fix berbentuk persegi (misal 220 x 220 piksel) agar pasti kotak
 function nyalakanKamera() {
   setTimeout(() => {
     html5QrCode.start(
       { facingMode: "environment" },
-      { 
-        fps: 20, 
-        qrbox: function(viewfinderWidth, viewfinderHeight) {
-          let minSize = Math.min(viewfinderWidth, viewfinderHeight);
-          let boxSize = Math.floor(minSize * 0.75); // Mengambil 75% dari sisi terkecil agar pas di dalam bingkai
-          return { width: boxSize, height: boxSize };
-        }
-      },
+      { fps: 20, qrbox: { width: 220, height: 220 } }, // <--- Ukuran dipatok sama persis (Persegi 1:1)
       handleScan
     ).catch(e => {
       if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
