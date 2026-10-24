@@ -1,47 +1,44 @@
-/* ── ROOT VARIABLES (Tema Tailwind Emerald & Putih Solid) ── */
+/* ── ROOT VARIABLES ── */
 :root{
-  --primary:#10b981;
-  --body-bg:#064e3b;
-  --body-solid:#064e3b;
+  --primary:#0F5132;
+  --body-bg:#0F5132;
+  --body-solid:#0F5132;
   --glow1:transparent;--glow2:transparent;--glow3:transparent;
   
-  /* Header disesuaikan tanpa gradasi & tanpa radius atas/bawah */
-  --hdr-bg:#047857;
-  --hdr-border:#059669;
+  --hdr-bg:#146c43;
+  --hdr-border:#D4AF37;
   
-  /* Glassmorphism diubah jadi solid bersih dengan kombinasi putih */
-  --glass:#065f46;
-  --glass-border:#059669;
+  --glass:#146c43;
+  --glass-border:#d1e7dd;
   --glass-shadow:none;
   
-  --badge:#10b981;
-  --badge-border:#059669;
-  --btn-bg:#10b981;
+  --badge:#d1e7dd;
+  --badge-border:#D4AF37;
+  --btn-bg:#146c43;
   --btn-glow:none;
   
-  /* Navigasi tanpa gradasi & tanpa radius */
-  --nav-bg:#047857;
-  --nav-border:#059669;
+  --nav-bg:#0F5132;
+  --nav-border:#D4AF37;
   
   --ic-pasif:rgba(255,255,255,.15);
-  --ic-ready:#059669;
-  --ic-ready-bdr:#10b981;
+  --ic-ready:#146c43;
+  --ic-ready-bdr:#D4AF37;
   --ic-ready-sh:none;
-  --ic-aktif:#ffffff;
-  --ic-aktif-txt:#065f46;
+  --ic-aktif:#D4AF37;
+  --ic-aktif-txt:#0F5132;
   
-  --inp-border:#059669;
-  --inp-focus-border:#ffffff;
-  --inp-focus-bg:#047857;
+  --inp-border:#d1e7dd;
+  --inp-focus-border:#D4AF37;
+  --inp-focus-bg:#146c43;
   
   --text:#ffffff;
-  --muted:#ecfdf5;
-  --accent:#ffffff;
+  --muted:#d1e7dd;
+  --accent:#D4AF37;
   
-  --scan-border:#10b981;
+  --scan-border:#D4AF37;
   --scan-glow:none;
-  --scroll-thumb:#059669;
-  --meta:#064e3b;
+  --scroll-thumb:#146c43;
+  --meta:#0F5132;
 }
 
 /* ── RESET ── */
@@ -153,7 +150,7 @@ body::before{
   box-shadow:none;transition:border-color .25s,background .25s;
 }
 .ket-wrap select:focus{border-color:var(--inp-focus-border);background:var(--inp-focus-bg)}
-.ket-wrap select option{background:#064e3b;color:#fff}
+.ket-wrap select option{background:#0F5132;color:#fff}
 .ket-wrap .ket-arrow{
   position:absolute;right:16px;top:50%;transform:translateY(-50%);
   color:var(--accent);font-size:12px;pointer-events:none;
@@ -175,7 +172,7 @@ body::before{
 @keyframes scanLine{0%{top:12%;opacity:.2}50%{top:82%;opacity:1}100%{top:12%;opacity:.2}}
 .scan-line{
   position:absolute;left:10%;width:80%;height:2px;z-index:9;
-  background:var(--primary);
+  background:var(--accent);
   box-shadow:none;
   animation:scanLine 2.5s ease-in-out infinite;
 }
@@ -209,7 +206,7 @@ body::before{
   background:var(--badge);border:1px solid var(--badge-border);
   display:flex;align-items:center;justify-content:center;
 }
-.last-scan-ic i{color:var(--accent);font-size:15px}
+.last-scan-ic i{color:var(--primary);font-size:15px}
 .last-scan-lbl{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
 #last-name-display{
   background:none;border:none;outline:none;
@@ -316,8 +313,8 @@ body::before{
   border-radius:0;margin-bottom:6px;
 }
 .s-row label{font-weight:600;font-size:12px;color:var(--text)}
-.s-row select{background:#047857;border:1px solid rgba(255,255,255,.2);border-radius:0;color:var(--text);padding:4px 7px;font-size:11px;outline:none}
-.s-row select option{background:#064e3b;color:#fff}
+.s-row select{background:#146c43;border:1px solid rgba(255,255,255,.2);border-radius:0;color:var(--text);padding:4px 7px;font-size:11px;outline:none}
+.s-row select option{background:#0F5132;color:#fff}
 .btn-simpan{
   width:100%;padding:13px;
   background:var(--btn-bg);color:white;font-weight:800;
@@ -349,7 +346,7 @@ body::before{
   border-radius:0;z-index:700;display:none;
   color:white;text-align:center;font-weight:800;font-size:13px;line-height:1.45;
   border:1px solid rgba(255,255,255,.3);font-family:'Inter',sans-serif;
-  background:#047857;
+  background:#146c43;
 }
 
 /* ── PWA POPUP ── */
