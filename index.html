@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src *;">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<link rel="icon" type="image/png" href="icon-presensi.png">
+<link rel="apple-touch-icon" href="icon-presensi.png">
+<title>PRESENSI DIGITAL SMP & SMK AZ-ZAHRO</title>
+<link rel="manifest" href="manifest.json">
+<meta id="metaThemeColor" name="theme-color" content="#051a0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<!-- File CSS Eksternal yang Dipisah -->
+<link rel="stylesheet" href="style.css">
+</head>
+<body onclick="onBodyClick()">
+
+<div class="gs gs1"></div>
+<div class="gs gs2"></div>
+<div class="gs gs3"></div>
+
+<!-- STATUS TOAST -->
+<div id="status-kirim"></div>
+
+<!-- ABOUT OVERLAY -->
+<div id="about-overlay" onclick="closeAbout()"></div>
+
+<!-- MODAL ANTREAN -->
+<div id="modal-antrean">
+  <div class="antr-card" onclick="event.stopPropagation()">
+    <div class="mhdr">
+      <h3><i class="fa-solid fa-clock-rotate-left"></i> Antrean Offline</h3>
+      <div class="btn-x" onclick="tutupModalAntrean()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+    <div id="loading-text">MENGIRIM: <span id="current-send">0</span>/<span id="total-send">0</span></div>
+    <div class="progress-container" id="prog-cont"><div class="progress-bar" id="prog-bar"></div></div>
+    <div id="daftar-item-antrean" style="margin-bottom:14px;max-height:280px;overflow-y:auto"></div>
+    <div style="display:flex;gap:10px">
+      <button onclick="kirimManual()" id="btn-kirim-manual" style="flex:1;background:var(--btn-bg);color:#fff;border:none;padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif">
+        <span id="text-btn-kirim">KIRIM</span>
+      </button>
+      <button onclick="tutupModalAntrean()" id="btn-tutup-antrean" style="flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#fff;padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif">TUTUP</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOP NAV -->
+<nav id="topNav">
+  <div class="nav-logos">
+    <img src="logo-smp-azzahro.png" alt="SMP">
+    <div class="nav-school">
+      <h1>PRESENSI DIGITAL</h1>
+      <p>SMP Islam Az-Zahro<br>SMK Az-Zahro</p>
+    </div>
+    <img src="logo-smk-azzahro.png" alt="SMK">
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div id="mainScroll">
+  <div class="main-inner">
+
+    <!-- DROPDOWN KETERANGAN -->
+    <div class="ket-wrap">
+      <select id="keterangan">
+        <option value="" disabled selected>Pilih Keterangan</option>
+        <option value="●">🟢 HADIR</option>
+        <option value="I">🟡 IZIN</option>
+        <option value="S">🔵 SAKIT</option>
+        <option value="A">🔴 ALPA</option>
+      </select>
+      <span class="ket-arrow"><i class="fa-solid fa-chevron-down"></i></span>
+    </div>
+
+    <!-- SCANNER -->
+    <div class="scanner-box">
+      <div class="sc-corner sc-tl"></div>
+      <div class="sc-corner sc-tr"></div>
+      <div class="sc-corner sc-bl"></div>
+      <div class="sc-corner sc-br"></div>
+      <div class="scan-line"></div>
+      <div id="reader"></div>
+      <div id="selection-overlay"></div>
+    </div>
+
+    <!-- NAMA TERAKHIR -->
+    <div class="last-scan">
+      <div class="last-scan-ic"><i class="fa-solid fa-id-card"></i></div>
+      <div style="flex:1;min-width:0">
+        <div class="last-scan-lbl">Terakhir Discan</div>
+        <input type="text" id="last-name-display" placeholder="MENUNGGU SCAN..." readonly>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav id="bottomNav">
+  <div class="nav-it" id="nTema" onclick="navKlik(this,'tema');event.stopPropagation()">
+    <div class="ic-wrap"><i class="fa-solid fa-palette"></i></div>
+    <span class="nav-lbl">Tema</span>
+  </div>
+  <div class="nav-it" id="nRekap" onclick="navKlik(this,'rekap');event.stopPropagation()">
+    <div class="ic-wrap"><i class="fa-solid fa-chart-pie"></i></div>
+    <span class="nav-lbl">Rekap</span>
+  </div>
+  <div class="nav-it" id="nOffline" onclick="navKlik(this,'offline');event.stopPropagation()">
+    <div class="ic-wrap"><i class="fa-solid fa-database"></i></div>
+    <span class="nav-lbl">Offline</span>
+  </div>
+  <div class="nav-it" id="nPengaturan" onclick="navKlik(this,'pengaturan');event.stopPropagation()">
+    <div class="ic-wrap"><i class="fa-solid fa-gear"></i></div>
+    <span class="nav-lbl">Pengaturan</span>
+  </div>
+</nav>
+
+<!-- MODAL TEMA -->
+<div class="modal-ov" id="mTema" onclick="tutupMod('mTema')">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <div class="mhdr">
+      <h3><i class="fa-solid fa-palette"></i> Pilih Tema</h3>
+      <div class="btn-x" onclick="tutupMod('mTema')"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:-8px;margin-bottom:14px">6 Tema Tersedia</p>
+    <button class="tswatch" style="background:linear-gradient(135deg,#09331f,#1a7a4a,#0d5a36);border-color:rgba(25,135,84,.4)" onclick="pilihTema('emerald');tutupMod('mTema')">
+      <span>🌿 Emerald Forest</span>
+      <div class="sdots"><div class="sdot" style="background:#09331f"></div><div class="sdot" style="background:#198754"></div><div class="sdot" style="background:#1a7a4a"></div><div class="sdot" style="background:#D4AF37"></div></div>
+    </button>
+    <button class="tswatch" style="background:linear-gradient(135deg,#0b0f19,#1e1b4b,#312e81);border-color:rgba(99,102,241,.4)" onclick="pilihTema('biru-ungu');tutupMod('mTema')">
+      <span>🔮 Blue Violet</span>
+      <div class="sdots"><div class="sdot" style="background:#0b0f19"></div><div class="sdot" style="background:#1e1b4b"></div><div class="sdot" style="background:#4f46e5"></div><div class="sdot" style="background:#818cf8"></div></div>
+    </button>
+    <button class="tswatch" style="background:linear-gradient(135deg,#0c1a3a,#1a3a6b,#2f7dff);border-color:rgba(47,125,255,.45)" onclick="pilihTema('electric-blue');tutupMod('mTema')">
+      <span>⚡ Electric Blue</span>
+      <div class="sdots"><div class="sdot" style="background:#0c1a3a"></div><div class="sdot" style="background:#1a3a6b"></div><div class="sdot" style="background:#2f7dff"></div><div class="sdot" style="background:#00c6ff"></div></div>
+    </button>
+    <button class="tswatch" style="background:linear-gradient(135deg,#1a0f05,#3a1c05,#7c2d00);border-color:rgba(234,88,12,.4)" onclick="pilihTema('sunset-orange');tutupMod('mTema')">
+      <span>🌅 Sunset Orange</span>
+      <div class="sdots"><div class="sdot" style="background:#1a0f05"></div><div class="sdot" style="background:#7c2d00"></div><div class="sdot" style="background:#ea580c"></div><div class="sdot" style="background:#eab308"></div></div>
+    </button>
+    <button class="tswatch" style="background:linear-gradient(135deg,#1a0520,#3d0f50,#7e1f75);border-color:rgba(219,39,119,.4)" onclick="pilihTema('rose-galaxy');tutupMod('mTema')">
+      <span>🌸 Rose Galaxy</span>
+      <div class="sdots"><div class="sdot" style="background:#1a0520"></div><div class="sdot" style="background:#3d0f50"></div><div class="sdot" style="background:#9333ea"></div><div class="sdot" style="background:#ec4899"></div></div>
+    </button>
+    <button class="tswatch" style="background:linear-gradient(135deg,#032028,#084255,#0e7490);border-color:rgba(6,182,212,.4)" onclick="pilihTema('ocean-teal');tutupMod('mTema')">
+      <span>🌊 Ocean Teal</span>
+      <div class="sdots"><div class="sdot" style="background:#032028"></div><div class="sdot" style="background:#084255"></div><div class="sdot" style="background:#0e7490"></div><div class="sdot" style="background:#22d3ee"></div></div>
+    </button>
+  </div>
+</div>
+
+<!-- MODAL PENGATURAN -->
+<div class="modal-ov" id="mPengaturan" onclick="tutupMod('mPengaturan')">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <div class="mhdr">
+      <h3><i class="fa-solid fa-sliders"></i> Pengaturan</h3>
+      <div class="btn-x" onclick="cancelSettings();tutupMod('mPengaturan')"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+    
+    <div class="s-title">🔔 Suara Notifikasi</div>
+    <div class="s-row">
+      <label>Pilih Suara</label>
+      <select id="sound-choice" style="width:52%">
+        <option value="notification/Notif01.mp3">Default</option>
+        <option value="notification/Notif02.mp3">Notifikasi 01</option>
+        <option value="notification/Notif03.mp3">Notifikasi 02</option>
+        <option value="notification/apple-success.mp3">Apple Success</option>
+        <option value="notification/success.mp3">Success</option>
+        <option value="notification/Done.mp3">Done</option>
+        <option value="notification/Notif-ML.mp3">Notifikasi ML</option>
+        <option value="notification/Mission-success.mp3">Mission Success</option>
+        <option value="notification/Success-fanfare-trumpets.mp3">Success Fanfare</option>
+        <option value="notification/floraphonic-cute-animal-squeak-1.mp3">Squeak 1</option>
+        <option value="notification/floraphonic-cute-animal-squeak-2.mp3">Squeak 2</option>
+        <option value="notification/Yayyy.mp3">Yayyy!!</option>
+        <option value="notification/kiw-kiw-cukurukuk-small-child.mp3">Kiw-kiw Child</option>
+        <option value="notification/kiw-kiw-original.mp3">Kiw-kiw Original</option>
+      </select>
+    </div>
+    
+    <button onclick="event.stopPropagation();showAbout()" style="width:100%;margin-top:8px;padding:11px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;color:var(--text);font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Inter',sans-serif">
+      <i class="fa-solid fa-circle-info" style="color:var(--accent)"></i> Tentang Aplikasi
+    </button>
+    
+    <button class="btn-simpan" onclick="saveSettings()"><i class="fa-solid fa-floppy-disk"></i> &nbsp;SIMPAN</button>
+  </div>
+</div>
+
+<!-- TENTANG -->
+<div id="about-pop-up">
+  <div class="modal-card" style="max-height:82vh;overflow-y:auto">
+    <div class="mhdr">
+      <h3><i class="fa-solid fa-circle-info"></i> Tentang Aplikasi</h3>
+      <div class="btn-x" onclick="closeAbout()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+    <p style="font-size:12px;line-height:1.7;color:var(--muted);margin-top:0">"Aplikasi Presensi Digital SMP Islam &amp; SMK Az-Zahro hadir sebagai solusi inovatif dalam mendukung digitalisasi pendidikan serta efisiensi administrasi sekolah. Dengan focus mentransformasi presensi konvensional menjadi sistem otomatis berbasis QR Code, aplikasi ini memastikan pendataan kehadiran berjalan cepat dan akurat. Melalui integrasi langsung dengan cloud storage, seluruh data tersinkronisasi secara otomatis tanpa perlu rekapitulasi manual di akhir hari."</p>
+    <div style="background:rgba(255,255,255,.05);padding:13px;border-radius:13px;font-size:11px;border-left:3px solid var(--accent)">
+      <div style="text-align:center;font-size:13px;font-weight:bold;color:var(--accent);margin-bottom:4px">IT DIGITALIZATION</div>
+      <div style="text-align:center;font-weight:bold;margin-bottom:10px;font-size:10px;color:var(--muted)">SMP ISLAM AZ-ZAHRO &amp; SMK AZ-ZAHRO</div>
+      <p style="margin:4px 0;color:var(--text)"><strong>Created by ops:</strong> Rahmattullah</p>
+      <p style="margin:4px 0;color:var(--text)"><strong>Email:</strong> rahmattullah.ofc@gmail.com</p>
+    </div>
+    <button class="btn-simpan" style="margin-top:14px" onclick="closeAbout()">TUTUP</button>
+  </div>
+</div>
+
+<!-- PWA POPUP -->
+<div id="pwa-popup">
+  <div class="pwa-card">
+    <img src="icon-presensi.png" alt="App Icon">
+    <h3>Instal Aplikasi</h3>
+    <p>Pasang Aplikasi Presensi Digital Az-Zahro di layar utama untuk akses lebih cepat.</p>
+    <div style="display:flex;gap:10px">
+      <button id="btnBatal" style="flex:1;background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,.15);padding:10px;border-radius:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">Nanti</button>
+      <button id="btnInstalPop" style="flex:1;background:var(--btn-bg);color:white;border:none;padding:10px;border-radius:11px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif">Instal</button>
+    </div>
+  </div>
+</div>
+
+<script src="cordova.js"></script>
+<script>
+/* =====================================================
+   DAFTAR_TEMA
+===================================================== */
+const DAFTAR_TEMA = {
+  'emerald':{
+    '--primary':'#198754','--body-bg':'linear-gradient(135deg,#051a0f 0%,#09331f 25%,#0d5a36 55%,#1a7a4a 75%,#0a4528 100%)','--body-solid':'#07261a',
+    '--glow1':'#198754','--glow2':'#D4AF37','--glow3':'#0ea56a',
+    '--hdr-bg':'linear-gradient(135deg,rgba(5,20,12,.97) 0%,rgba(9,51,31,.96) 35%,rgba(20,108,67,.93) 65%,rgba(14,82,52,.97) 100%)','--hdr-border':'rgba(212,175,55,.35)',
+    '--glass':'linear-gradient(145deg,rgba(255,255,255,.14) 0%,rgba(25,135,84,.08) 50%,rgba(255,255,255,.06) 100%)','--glass-border':'rgba(255,255,255,.22)',
+    '--badge':'linear-gradient(135deg,rgba(25,135,84,.4) 0%,rgba(212,175,55,.28) 100%)','--badge-border':'rgba(212,175,55,.5)',
+    '--btn-bg':'linear-gradient(135deg,#22a161 0%,#1a7a4a 40%,#146c43 70%,#0F5132 100%)','--btn-glow':'0 0 28px rgba(25,135,84,.5),0 0 10px rgba(212,175,55,.2),0 4px 14px rgba(20,108,67,.55)',
+    '--nav-bg':'linear-gradient(180deg,rgba(7,26,16,.97) 0%,rgba(5,18,10,.99) 100%)','--nav-border':'rgba(212,175,55,.3)',
+    '--ic-ready':'linear-gradient(135deg,rgba(26,122,74,.85),rgba(20,108,67,.75))','--ic-ready-bdr':'rgba(212,175,55,.65)','--ic-ready-sh':'0 4px 20px rgba(25,135,84,.55),0 0 12px rgba(212,175,55,.2)',
+    '--ic-aktif':'linear-gradient(135deg,#D4AF37,#f0c830,#ffe066)','--ic-aktif-txt':'#0F5132',
+    '--inp-border':'rgba(255,255,255,.22)','--inp-focus-border':'rgba(212,175,55,.75)','--inp-focus-bg':'rgba(25,135,84,.18)',
+    '--muted':'#c8e6d4','--accent':'#D4AF37','--scan-border':'rgba(25,135,84,.9)','--scan-glow':'rgba(25,135,84,.5)','--scroll-thumb':'rgba(212,175,55,.35)','--meta':'#051a0f'
+  },
+  'biru-ungu':{
+    '--primary':'#6366f1','--body-bg':'linear-gradient(135deg,#0b0f19 0%,#1a1040 30%,#2d1b69 60%,#1e1b4b 100%)','--body-solid':'#0d1030',
+    '--glow1':'#4f46e5','--glow2':'#a78bfa','--glow3':'#7c3aed',
+    '--hdr-bg':'linear-gradient(135deg,rgba(11,15,25,.97) 0%,rgba(30,27,75,.95) 40%,rgba(79,70,229,.35) 100%)','--hdr-border':'rgba(167,139,250,.35)',
+    '--glass':'linear-gradient(145deg,rgba(255,255,255,.13) 0%,rgba(99,102,241,.1) 50%,rgba(255,255,255,.05) 100%)','--glass-border':'rgba(255,255,255,.22)',
+    '--badge':'linear-gradient(135deg,rgba(99,102,241,.4) 0%,rgba(167,139,250,.28) 100%)','--badge-border':'rgba(167,139,250,.5)',
+    '--btn-bg':'linear-gradient(135deg,#818cf8 0%,#6366f1 40%,#4f46e5 70%,#3730a3 100%)','--btn-glow':'0 0 28px rgba(99,102,241,.5),0 0 10px rgba(167,139,250,.3),0 4px 14px rgba(79,70,229,.55)',
+    '--nav-bg':'linear-gradient(180deg,rgba(11,15,25,.97) 0%,rgba(8,10,22,.99) 100%)','--nav-border':'rgba(167,139,250,.3)',
+    '--ic-ready':'linear-gradient(135deg,rgba(99,102,241,.85),rgba(79,70,229,.75))','--ic-ready-bdr':'rgba(167,139,250,.65)','--ic-ready-sh':'0 4px 20px rgba(99,102,241,.55),0 0 12px rgba(167,139,250,.3)',
+    '--ic-aktif':'linear-gradient(135deg,#a78bfa,#c4b5fd,#ddd6fe)','--ic-aktif-txt':'#1e1b4b',
+    '--inp-border':'rgba(167,139,250,.25)','--inp-focus-border':'rgba(167,139,250,.75)','--inp-focus-bg':'rgba(99,102,241,.18)',
+    '--muted':'#c4b5fd','--accent':'#a78bfa','--scan-border':'rgba(99,102,241,.9)','--scan-glow':'rgba(99,102,241,.4)','--scroll-thumb':'rgba(167,139,250,.35)','--meta':'#0b0f19'
+  },
+  'electric-blue':{
+    '--primary':'#2f7dff','--body-bg':'linear-gradient(135deg,#0c1a3a 0%,#0a2460 30%,#1a3a8f 60%,#0c1a5c 100%)','--body-solid':'#0a1430',
+    '--glow1':'#2f7dff','--glow2':'#00c6ff','--glow3':'#cb3dff',
+    '--hdr-bg':'linear-gradient(135deg,rgba(12,26,58,.97) 0%,rgba(26,58,143,.92) 50%,rgba(47,125,255,.25) 100%)','--hdr-border':'rgba(0,198,255,.35)',
+    '--glass':'linear-gradient(145deg,rgba(255,255,255,.12) 0%,rgba(47,125,255,.1) 50%,rgba(255,255,255,.05) 100%)','--glass-border':'rgba(255,255,255,.2)',
+    '--badge':'linear-gradient(135deg,rgba(47,125,255,.4) 0%,rgba(0,198,255,.25) 100%)','--badge-border':'rgba(0,198,255,.5)',
+    '--btn-bg':'linear-gradient(135deg,#60a5fa 0%,#2f7dff 40%,#1a5ae8 70%,#1240b0 100%)','--btn-glow':'0 0 28px rgba(47,125,255,.6),0 0 10px rgba(0,198,255,.3),0 4px 14px rgba(47,125,255,.55)',
+    '--nav-bg':'linear-gradient(180deg,rgba(10,20,48,.97) 0%,rgba(7,14,36,.99) 100%)','--nav-border':'rgba(0,198,255,.3)',
+    '--ic-ready':'linear-gradient(135deg,rgba(47,125,255,.85),rgba(26,90,232,.75))','--ic-ready-bdr':'rgba(0,198,255,.65)','--ic-ready-sh':'0 4px 20px rgba(47,125,255,.6),0 0 16px rgba(0,198,255,.3)',
+    '--ic-aktif':'linear-gradient(135deg,#00c6ff,#60e0ff,#b3f0ff)','--ic-aktif-txt':'#0c1a3a',
+    '--inp-border':'rgba(0,198,255,.25)','--inp-focus-border':'rgba(0,198,255,.75)','--inp-focus-bg':'rgba(47,125,255,.18)',
+    '--muted':'#93c5fd','--accent':'#00c6ff','--scan-border':'rgba(47,125,255,.9)','--scan-glow':'rgba(47,125,255,.5)','--scroll-thumb':'rgba(0,198,255,.35)','--meta':'#0c1a3a'
+  },
+  'sunset-orange':{
+    '--primary':'#ea580c','--body-bg':'linear-gradient(135deg,#1a0f05 0%,#3a1c05 25%,#7c2d00 55%,#c2410c 75%,#431407 100%)','--body-solid':'#180d03',
+    '--glow1':'#ea580c','--glow2':'#eab308','--glow3':'#f97316',
+    '--hdr-bg':'linear-gradient(135deg,rgba(26,15,5,.97) 0%,rgba(58,28,5,.95) 35%,rgba(124,45,0,.88) 65%,rgba(90,30,0,.97) 100%)','--hdr-border':'rgba(234,179,8,.35)',
+    '--glass':'linear-gradient(145deg,rgba(255,255,255,.13) 0%,rgba(234,88,12,.09) 50%,rgba(255,255,255,.05) 100%)','--glass-border':'rgba(255,255,255,.2)',
+    '--badge':'linear-gradient(135deg,rgba(234,88,12,.4) 0%,rgba(234,179,8,.28) 100%)','--badge-border':'rgba(234,179,8,.5)',
+    '--btn-bg':'linear-gradient(135deg,#fb923c 0%,#ea580c 40%,#c2410c 70%,#9a3412 100%)','--btn-glow':'0 0 28px rgba(234,88,12,.5),0 0 10px rgba(234,179,8,.3),0 4px 14px rgba(194,65,12,.55)',
+    '--nav-bg':'linear-gradient(180deg,rgba(26,15,5,.97) 0%,rgba(18,9,2,.99) 100%)','--nav-border':'rgba(234,179,8,.3)',
+    '--ic-ready':'linear-gradient(135deg,rgba(234,88,12,.85),rgba(194,65,12,.75))','--ic-ready-bdr':'rgba(234,179,8,.65)','--ic-ready-sh':'0 4px 20px rgba(234,88,12,.55),0 0 12px rgba(234,179,8,.3)',
+    '--ic-aktif':'linear-gradient(135deg,#eab308,#facc15,#fde047)','--ic-aktif-txt':'#1a0f05',
+    '--inp-border':'rgba(234,179,8,.22)','--inp-focus-border':'rgba(234,179,8,.75)','--inp-focus-bg':'rgba(234,88,12,.18)',
+    '--muted':'#fed7aa','--accent':'#eab308','--scan-border':'rgba(234,88,12,.9)','--scan-glow':'rgba(234,88,12,.4)','--scroll-thumb':'rgba(234,179,8,.35)','--meta':'#1a0f05'
+  },
+  'rose-galaxy':{
+    '--primary':'#ec4899','--body-bg':'linear-gradient(135deg,#1a0520 0%,#3d0f50 30%,#701a6e 60%,#3a0742 100%)','--body-solid':'#150318',
+    '--glow1':'#ec4899','--glow2':'#a855f7','--glow3':'#f472b6',
+    '--hdr-bg':'linear-gradient(135deg,rgba(26,5,32,.97) 0%,rgba(61,15,80,.95) 35%,rgba(147,51,234,.3) 65%,rgba(93,15,130,.97) 100%)','--hdr-border':'rgba(236,72,153,.35)',
+    '--glass':'linear-gradient(145deg,rgba(255,255,255,.13) 0%,rgba(236,72,153,.09) 50%,rgba(255,255,255,.05) 100%)','--glass-border':'rgba(255,255,255,.2)',
+    '--badge':'linear-gradient(135deg,rgba(236,72,153,.4) 0%,rgba(168,85,247,.28) 100%)','--badge-border':'rgba(236,72,153,.5)',
+    '--btn-bg':'linear-gradient(135deg,#f472b6 0%,#ec4899 40%,#db2777 70%,#be185d 100%)','--btn-glow':'0 0 28px rgba(236,72,153,.5),0 0 10px rgba(168,85,247,.3),0 4px 14px rgba(219,39,119,.55)',
+    '--nav-bg':'linear-gradient(180deg,rgba(26,5,32,.97) 0%,rgba(18,2,22,.99) 100%)','--nav-border':'rgba(236,72,153,.3)',
+    '--ic-ready':'linear-gradient(135deg,rgba(236,72,153,.85),rgba(219,39,119,.75))','--ic-ready-bdr':'rgba(236,72,153,.65)','--ic-ready-sh':'0 4px 20px rgba(236,72,153,.55),0 0 12px rgba(168,85,247,.3)',
+    '--ic-aktif':'linear-gradient(135deg,#a855f7,#c084fc,#e879f9)','--ic-aktif-txt':'#1a0520',
+    '--inp-border':'rgba(236,72,153,.25)','--inp-focus-border':'rgba(236,72,153,.75)','--inp-focus-bg':'rgba(236,72,153,.15)',
+    '--muted':'#f9a8d4','--accent':'#f472b6','--scan-border':'rgba(236,72,153,.9)','--scan-glow':'rgba(236,72,153,.4)','--scroll-thumb':'rgba(236,72,153,.35)','--meta':'#1a0520'
+  },
+  'ocean-teal':{
+    '--primary':'#06b6d4','--body-bg':'linear-gradient(135deg,#032028 0%,#063040 25%,#0e6a80 55%,#0891b2 75%,#042a38 100%)','--body-solid':'#031820',
+    '--glow1':'#06b6d4','--glow2':'#22d3ee','--glow3':'#0ea5e9',
+    '--hdr-bg':'linear-gradient(135deg,rgba(3,32,40,.97) 0%,rgba(8,65,85,.95) 35%,rgba(14,116,144,.9) 65%,rgba(6,60,80,.97) 100%)','--hdr-border':'rgba(34,211,238,.35)',
+    '--glass':'linear-gradient(145deg,rgba(255,255,255,.13) 0%,rgba(6,182,212,.1) 50%,rgba(255,255,255,.05) 100%)','--glass-border':'rgba(255,255,255,.2)',
+    '--badge':'linear-gradient(135deg,rgba(6,182,212,.4) 0%,rgba(34,211,238,.25) 100%)','--badge-border':'rgba(34,211,238,.5)',
+    '--btn-bg':'linear-gradient(135deg,#22d3ee 0%,#06b6d4 40%,#0891b2 70%,#0e7490 100%)','--btn-glow':'0 0 28px rgba(6,182,212,.5),0 0 10px rgba(34,211,238,.3),0 4px 14px rgba(8,145,178,.55)',
+    '--nav-bg':'linear-gradient(180deg,rgba(3,32,40,.97) 0%,rgba(2,20,28,.99) 100%)','--nav-border':'rgba(34,211,238,.3)',
+    '--ic-ready':'linear-gradient(135deg,rgba(6,182,212,.85),rgba(8,145,178,.75))','--ic-ready-bdr':'rgba(34,211,238,.65)','--ic-ready-sh':'0 4px 20px rgba(6,182,212,.55),0 0 12px rgba(34,211,238,.3)',
+    '--ic-aktif':'linear-gradient(135deg,#22d3ee,#67e8f9,#a5f3fc)','--ic-aktif-txt':'#032028',
+    '--inp-border':'rgba(34,211,238,.22)','--inp-focus-border':'rgba(34,211,238,.75)','--inp-focus-bg':'rgba(6,182,212,.18)',
+    '--muted':'#a5f3fc','--accent':'#22d3ee','--scan-border':'rgba(6,182,212,.9)','--scan-glow':'rgba(6,182,212,.4)','--scroll-thumb':'rgba(34,211,238,.35)','--meta':'#032028'
+  }
+};
+
+/* =====================================================
+   TERAPKAN TEMA
+===================================================== */
+function pilihTema(nama) {
+  const t = DAFTAR_TEMA[nama];
+  if (!t) return;
+  const r = document.documentElement;
+  Object.entries(t).forEach(([k,v]) => {
+    if (k === '--meta') document.getElementById('metaThemeColor').content = v;
+    else r.style.setProperty(k, v);
+  });
+  localStorage.setItem('presensi_theme', nama);
+}
+
+/* =====================================================
+   MODAL
+===================================================== */
+let activeModal = null;
+
+function bukaMod(id) {
+  if (activeModal) tutupMod(activeModal);
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('show');
+  activeModal = id;
+}
+
+function tutupMod(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('show');
+  if (activeModal === id) activeModal = null;
+  resetNav();
+}
+
+/* =====================================================
+   BODY CLICK
+===================================================== */
+function onBodyClick() {
+  if (activeModal) return;
+  const antrOpen = document.getElementById('modal-antrean').style.display === 'flex';
+  const aboutOpen = document.getElementById('about-pop-up').style.display === 'block';
+  if (antrOpen || aboutOpen) return;
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(()=>{});
+    document.getElementById('fullscreen-info').style.display = 'none';
+  }
+}
+
+/* =====================================================
+   NAV DOCK
+===================================================== */
+const navState = {};
+
+function navKlik(el, aksi) {
+  const id = el.id;
+  const st = navState[id] || 'idle';
+  document.querySelectorAll('.nav-it').forEach(n => {
+    if (n.id !== id) { n.classList.remove('ready','active'); navState[n.id]='idle'; }
+  });
+  if (st === 'idle') {
+    el.classList.add('ready'); navState[id]='ready';
+  } else if (st === 'ready') {
+    el.classList.remove('ready'); el.classList.add('active'); navState[id]='active';
+    jalankanNav(aksi);
+  } else {
+    el.classList.remove('active'); el.classList.add('ready'); navState[id]='ready';
+  }
+}
+
+function jalankanNav(aksi) {
+  if (aksi === 'tema') { bukaMod('mTema'); }
+  else if (aksi === 'rekap') { window.open('rekapitulasi.html','_blank'); resetNav(); }
+  else if (aksi === 'offline') { bukaModalAntrean(null); }
+  else if (aksi === 'pengaturan') { applySettings(); bukaMod('mPengaturan'); }
+}
+
+function resetNav() {
+  document.querySelectorAll('.nav-it').forEach(n => { n.classList.remove('ready','active'); navState[n.id]='idle'; });
+}
+
+/* =====================================================
+   SETTINGS
+===================================================== */
+const rawURL = '';
+
+function applySettings() {
+  const cfg = JSON.parse(localStorage.getItem('absensiConfig')) || {
+    sound:'notification/Notif01.mp3'
+  };
+  document.getElementById('sound-choice').value = cfg.sound;
+}
+
+function cancelSettings() { applySettings(); }
+
+function saveSettings() {
+  const cfg = {
+    sound:document.getElementById('sound-choice').value
+  };
+  localStorage.setItem('absensiConfig', JSON.stringify(cfg));
+  new Audio(rawURL+cfg.sound).play().catch(()=>{});
+  tutupMod('mPengaturan');
+}
+
+/* =====================================================
+   ABOUT
+===================================================== */
+function showAbout() {
+  document.getElementById('about-pop-up').style.display='block';
+  document.getElementById('about-overlay').style.display='block';
+}
+function closeAbout() {
+  document.getElementById('about-pop-up').style.display='none';
+  document.getElementById('about-overlay').style.display='none';
+}
+
+/* =====================================================
+   STATUS UI
+===================================================== */
+function updateStatusUI(pesan, warna) {
+  const s = document.getElementById('status-kirim');
+  s.textContent = pesan;
+  s.style.backgroundColor = warna;
+  s.style.display = 'block';
+  setTimeout(()=>{ s.style.display='none'; isProcessing=false; detectedBarcodes.clear(); }, 4000);
+}
+
+/* =====================================================
+   INDEXEDDB
+===================================================== */
+const dbName = "PresensiOfflineDB";
+let db;
+const reqDB = indexedDB.open(dbName, 1);
+reqDB.onupgradeneeded = e => {
+  db = e.target.result;
+  if (!db.objectStoreNames.contains("antrean"))
+    db.createObjectStore("antrean",{keyPath:"id",autoIncrement:true});
+};
+reqDB.onsuccess = e => { db=e.target.result; updateBadge(); };
+
+function updateBadge() {
+  if (!db) return;
+  const tx = db.transaction(["antrean"],"readonly");
+  tx.objectStore("antrean").count().onsuccess = e => {};
+}
+
+function bukaModalAntrean(ev) {
+  if (ev) ev.stopPropagation();
+  const modal = document.getElementById('modal-antrean');
+  const cont = document.getElementById('daftar-item-antrean');
+  document.getElementById('prog-cont').style.display='none';
+  document.getElementById('loading-text').style.display='none';
+  cont.innerHTML="<p style='text-align:center;color:rgba(255,255,255,.4)'>Memuat data...</p>";
+  modal.style.display='flex';
+  const tx=db.transaction(["antrean"],"readonly");
+  tx.objectStore("antrean").getAll().onsuccess = e => {
+    const items=e.target.result;
+    const btnK=document.getElementById('btn-kirim-manual');
+    const txtK=document.getElementById('text-btn-kirim');
+    if (items.length===0) {
+      cont.innerHTML="<p style='color:rgba(255,255,255,.4);text-align:center'>Tidak ada data offline.</p>";
+      btnK.disabled=true; btnK.style.opacity="0.5"; return;
+    }
+    btnK.disabled=false; btnK.style.opacity="1";
+    txtK.textContent="KIRIM"; txtK.classList.remove('loading-dots');
+    cont.innerHTML=items.map(it=>`<div style="background:rgba(255,255,255,.06);padding:10px 14px;border-radius:11px;margin-bottom:8px;border-left:3px solid #f39c12"><strong style="font-size:14px">${it.nama}</strong><br><small style="color:rgba(255,255,255,.45)">Keterangan: ${it.keterangan}</small></div>`).join('');
+  };
+}
+
+function tutupModalAntrean() {
+  document.getElementById('modal-antrean').style.display='none';
+  resetNav();
+}
+
+async function kirimManual() {
+  if (!navigator.onLine) { updateStatusUI("ⓘ ANDA SEDANG OFFLINE!\nSILAKAN HUBUNGKAN KE INTERNET TERLEBIH DAHULU","#e67e22"); return; }
+  const btnK=document.getElementById('btn-kirim-manual'), txtK=document.getElementById('text-btn-kirim'),
+        btnT=document.getElementById('btn-tutup-antrean'), progC=document.getElementById('prog-cont'),
+        progB=document.getElementById('prog-bar'), loadT=document.getElementById('loading-text'),
+        totT=document.getElementById('total-send'), curT=document.getElementById('current-send');
+  btnK.disabled=true; btnK.style.opacity="0.6"; btnK.style.background="#555";
+  txtK.textContent="MENGIRIM"; txtK.classList.add('loading-dots'); btnT.disabled=true;
+  const data = await new Promise(res=>{ const tx=db.transaction(["antrean"],"readwrite"); tx.objectStore("antrean").getAll().onsuccess=e=>res(e.target.result); });
+  if (data.length===0) { btnK.disabled=false; btnT.disabled=false; return; }
+  progC.style.display='block'; loadT.style.display='block'; totT.textContent=data.length;
+  for (let i=0;i<data.length;i++) {
+    const item=data[i]; curT.textContent=i+1;
+    progB.style.width=((i+1)/data.length*100)+"%";
+    await fetch(`${scriptURL}?nama=${encodeURIComponent(item.nama)}&keterangan=${encodeURIComponent(item.keterangan)}`,{method:'GET',mode:'no-cors'});
+    const delTx=db.transaction(["antrean"],"readwrite"); delTx.objectStore("antrean").delete(item.id);
+    await new Promise(r=>setTimeout(r,100));
+  }
+  new Audio(rawURL+'notification/succes-data-offline.mp3').play().catch(()=>{});
+  updateBadge();
+  updateStatusUI("✔ SEMUA DATA BERHASIL TERKIRIM!","var(--primary)");
+  setTimeout(()=>{
+    tutupModalAntrean(); btnK.disabled=false; btnT.disabled=false;
+    btnK.style.opacity="1"; btnK.style.background="var(--btn-bg)";
+    txtK.textContent="KIRIM"; txtK.classList.remove('loading-dots');
+  },1500);
+}
+
+/* =====================================================
+   SEND PRESENCE / QR LOGIC
+===================================================== */
+const scriptURL='https://script.google.com/macros/s/AKfycbwzJeGPQLKAYIOMUWht45sHz3Vv-JBOJ9jfeFZ434ANaT8sPSe2JQI441YoZBrdqV9a/exec';
+let isProcessing=false, detectedBarcodes=new Set(), scanTimer=null;
+
+function sendPresence(nama) {
+  const ket=document.getElementById('keterangan').value;
+  if (!ket) { updateStatusUI("✖ PILIH KETERANGAN DULU!","#e74c3c"); isProcessing=false; document.getElementById('selection-overlay').style.display='none'; return; }
+  document.getElementById('last-name-display').value=nama;
+  const cfg=JSON.parse(localStorage.getItem('absensiConfig'))||{sound:'notification/Notif01.mp3'};
+  new Audio(rawURL+cfg.sound).play().catch(()=>{});
+  if (navigator.onLine) {
+    updateStatusUI("✔ TERKIRIM: "+nama,"var(--primary)");
+    fetch(`${scriptURL}?nama=${encodeURIComponent(nama)}&keterangan=${encodeURIComponent(ket)}`,{method:'GET',mode:'no-cors',cache:'no-store'});
+  } else { simpanKeOffline({nama,keterangan:ket}); }
+  document.getElementById('selection-overlay').style.display='none';
+}
+
+function simpanKeOffline(data) {
+  if (!db) return;
+  const cfg=JSON.parse(localStorage.getItem('absensiConfig'))||{sound:'notification/Notif01.mp3'};
+  new Audio(rawURL+cfg.sound).play().catch(()=>{});
+  const tx=db.transaction(["antrean"],"readwrite"); tx.objectStore("antrean").add(data);
+  tx.oncomplete=()=>{ updateBadge(); updateStatusUI("☁ OFFLINE: "+data.nama+"\nDATA TERSIMPAN DI ANTREAN","#f39c12"); };
+}
+
+async function sinkronkanData() {
+  if (!db||!navigator.onLine) return;
+  const tx=db.transaction(["antrean"],"readonly");
+  tx.objectStore("antrean").count().onsuccess=e=>{ if(e.target.result>0) updateStatusUI("ⓘ ADA DATA OFFLINE!\nSILAKAN KIRIM DARI MENU OFFLINE","#f39c12"); };
+}
+window.addEventListener('online', sinkronkanData);
+
+function handleScan(txt) {
+  if (isProcessing) return;
+  detectedBarcodes.add(txt.trim());
+  if (scanTimer) clearTimeout(scanTimer);
+  scanTimer=setTimeout(()=>{
+    const res=Array.from(detectedBarcodes);
+    if (res.length>1) {
+      isProcessing=true;
+      const ov=document.getElementById('selection-overlay');
+      ov.innerHTML=`<p style="color:white;font-size:12px;font-weight:bold;margin-bottom:10px">TERDETEKSI ${res.length} BARCODE. PILIH NAMA:</p>`;
+      res.forEach(nama=>{ const b=document.createElement('div'); b.className='barcode-option'; b.textContent=nama; b.onclick=e=>{e.stopPropagation();sendPresence(nama);}; ov.appendChild(b); });
+      const batal=document.createElement('div'); batal.className='barcode-option'; batal.style.background='rgba(127,140,141,.6)'; batal.textContent='BATAL — SCAN ULANG';
+      batal.onclick=e=>{e.stopPropagation();ov.style.display='none';isProcessing=false;detectedBarcodes.clear();};
+      ov.appendChild(batal); ov.style.display='flex';
+    } else if (res.length===1) { isProcessing=true; sendPresence(res[0]); }
+  },300);
+}
+
+const html5QrCode = new Html5Qrcode("reader");
+
+function initAppPlatform() {
+  if (window.cordova) {
+    document.addEventListener("deviceready", onCordovaReady, false);
+  } else {
+    nyalakanKamera();
+  }
+}
+
+function onCordovaReady() {
+  if (cordova.plugins && cordova.plugins.permissions) {
+    const permissions = cordova.plugins.permissions;
+    permissions.requestPermission(permissions.CAMERA, function(status) {
+      if (status.hasPermission) {
+        nyalakanKamera();
+      } else {
+        alert("Aplikasi memerlukan izin kamera untuk melakukan scan presensi.");
+      }
+    }, function() {
+      alert("Gagal memproses permintaan izin kamera.");
+    });
+  } else {
+    nyalakanKamera();
+  }
+}
+
+function nyalakanKamera() {
+  setTimeout(() => {
+    html5QrCode.start(
+      { facingMode: "environment" },
+      { fps: 20, qrbox: { width: 260, height: 260 } },
+      handleScan
+    ).catch(e => {
+      console.error("Gagal menyalakan kamera: ", e);
+      if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+        alert("Gagal akses kamera: Browser membutuhkan koneksi aman (HTTPS) untuk mengaktifkan kamera.");
+      }
+    });
+  }, 100);
+}
+
+window.addEventListener('DOMContentLoaded', initAppPlatform);
+
+/* =====================================================
+   PWA
+===================================================== */
+let pwaPrompt;
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault(); pwaPrompt=e;
+  setTimeout(()=>{ document.getElementById('pwa-popup').style.display='flex'; },2000);
+});
+document.getElementById('btnInstalPop').onclick=async()=>{
+  if (!pwaPrompt) return;
+  document.getElementById('pwa-popup').style.display='none';
+  pwaPrompt.prompt(); pwaPrompt=null;
+};
+document.getElementById('btnBatal').onclick=()=>{ document.getElementById('pwa-popup').style.display='none'; };
+
+/* =====================================================
+   INIT
+===================================================== */
+window.addEventListener('DOMContentLoaded',()=>{
+  pilihTema(localStorage.getItem('presensi_theme')||'emerald');
+  applySettings();
+});
+</script>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').then(()=>console.log("SW Aktif!"));
+}
+
+document.addEventListener("deviceready", () => {
+    if(window.screen && window.screen.orientation) {
+        window.screen.orientation.lock("portrait");
+    }
+}, false);
+</script>
+</body>
+</html>
