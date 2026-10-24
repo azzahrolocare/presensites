@@ -108,6 +108,21 @@
 
         /* Bottom Nav Styling (1 Klik & Bentuk Kotak Sudut Lengkung/rounded-xl) */
         .nav-it.active .ic-wrap { background-color: #D4AF37; color: #0F5132; }
+
+        /* Siku-siku Putih di 4 Sudut Scanner */
+        .corner-bracket {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-color: #ffffff;
+            border-style: solid;
+            z-index: 20;
+            pointer-events: none;
+        }
+        .corner-tl { top: 12px; left: 12px; border-width: 3px 0 0 3px; border-top-left-radius: 4px; }
+        .corner-tr { top: 12px; right: 12px; border-width: 3px 3px 0 0; border-top-right-radius: 4px; }
+        .corner-bl { bottom: 12px; left: 12px; border-width: 0 0 3px 3px; border-bottom-left-radius: 4px; }
+        .corner-br { bottom: 12px; right: 12px; border-width: 0 3px 3px 0; border-bottom-right-radius: 4px; }
     </style>
 </head>
 <body id="mainBody" class="bg-[#f8fafc] min-h-screen text-gray-800 antialiased flex flex-col justify-between overflow-x-hidden" onclick="onBodyClick()">
@@ -180,8 +195,14 @@
           </select>
         </div>
 
-        <!-- SCANNER BOX (PERSEGI 1:1) -->
+        <!-- SCANNER BOX (PERSEGI 1:1 DENGAN SIKU-SIKU PUTIH DI SUDUT) -->
         <div class="w-full max-w-[320px] aspect-square rounded-2xl overflow-hidden border-2 border-emerald-deep shadow-lg bg-black relative flex items-center justify-center">
+          <!-- Siku-siku Putih -->
+          <div class="corner-bracket corner-tl"></div>
+          <div class="corner-bracket corner-tr"></div>
+          <div class="corner-bracket corner-bl"></div>
+          <div class="corner-bracket corner-br"></div>
+
           <div id="reader" class="w-full h-full absolute inset-0"></div>
           <div id="selection-overlay" class="absolute inset-0 bg-black/90 z-[100] hidden flex-col items-center justify-center gap-2 p-4"></div>
         </div>
