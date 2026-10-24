@@ -106,23 +106,23 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
 
-        /* Bottom Nav Styling (1 Klik & Bentuk Kotak Sudut Lengkung/rounded-xl) */
+        /* Bottom Nav Styling (Aktif & Kotak Sudut Lengkung) */
         .nav-it.active .ic-wrap { background-color: #D4AF37; color: #0F5132; }
 
         /* Siku-siku Putih di 4 Sudut Scanner */
         .corner-bracket {
             position: absolute;
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             border-color: #ffffff;
             border-style: solid;
             z-index: 20;
             pointer-events: none;
         }
-        .corner-tl { top: 12px; left: 12px; border-width: 3px 0 0 3px; border-top-left-radius: 4px; }
-        .corner-tr { top: 12px; right: 12px; border-width: 3px 3px 0 0; border-top-right-radius: 4px; }
-        .corner-bl { bottom: 12px; left: 12px; border-width: 0 0 3px 3px; border-bottom-left-radius: 4px; }
-        .corner-br { bottom: 12px; right: 12px; border-width: 0 3px 3px 0; border-bottom-right-radius: 4px; }
+        .corner-tl { top: 16px; left: 16px; border-width: 4px 0 0 4px; border-top-left-radius: 6px; }
+        .corner-tr { top: 16px; right: 16px; border-width: 4px 4px 0 0; border-top-right-radius: 6px; }
+        .corner-bl { bottom: 16px; left: 16px; border-width: 0 0 4px 4px; border-bottom-left-radius: 6px; }
+        .corner-br { bottom: 16px; right: 16px; border-width: 0 4px 4px 0; border-bottom-right-radius: 6px; }
     </style>
 </head>
 <body id="mainBody" class="bg-[#f8fafc] min-h-screen text-gray-800 antialiased flex flex-col justify-between overflow-x-hidden" onclick="onBodyClick()">
@@ -153,8 +153,8 @@
       </div>
     </div>
 
-    <!-- TOP NAV -->
-    <nav class="sticky top-0 z-40 bg-emerald-deep text-white px-4 py-4 shadow-lg border-b border-emerald-medium/30">
+    <!-- TOP NAV (Header diperluas dengan paddingTop lebih besar agar aman dari kamera/poni HP) -->
+    <nav class="sticky top-0 z-40 bg-emerald-deep text-white px-4 pt-7 pb-5 shadow-lg border-b border-emerald-medium/30">
       <div class="max-w-7xl mx-auto flex flex-col items-center justify-center gap-2">
         
         <!-- Baris Atas: Logo & Judul Utama (SMP Baris Atas, SMK Baris Bawah) -->
@@ -182,7 +182,7 @@
     </nav>
 
     <!-- MAIN CONTENT -->
-    <div class="w-full max-w-md mx-auto p-4 flex flex-col gap-4 mt-2 pb-24 items-center">
+    <div class="w-full max-w-md mx-auto p-4 flex flex-col gap-4 mt-2 pb-28 items-center">
 
         <!-- DROPDOWN KETERANGAN -->
         <div class="relative w-full">
@@ -195,8 +195,8 @@
           </select>
         </div>
 
-        <!-- SCANNER BOX (PERSEGI 1:1 DENGAN SIKU-SIKU PUTIH DI SUDUT) -->
-        <div class="w-full max-w-[320px] aspect-square rounded-2xl overflow-hidden border-2 border-emerald-deep shadow-lg bg-black relative flex items-center justify-center">
+        <!-- SCANNER BOX (PERSEGI 1:1 DENGAN UKURAN LEBIH BESAR & SIKU-SIKU PUTIH) -->
+        <div class="w-full max-w-[350px] aspect-square rounded-2xl overflow-hidden border-2 border-emerald-deep shadow-lg bg-black relative flex items-center justify-center">
           <!-- Siku-siku Putih -->
           <div class="corner-bracket corner-tl"></div>
           <div class="corner-bracket corner-tr"></div>
@@ -221,27 +221,27 @@
     </div>
 </div>
 
-<!-- BOTTOM NAV DOCK (1 Klik & Bentuk Kotak Sudut Lengkung/rounded-xl) -->
-<nav id="bottomNav" class="fixed bottom-0 left-0 right-0 h-16 bg-emerald-deep border-t border-emerald-medium/40 shadow-2xl z-[200] flex items-center justify-around px-2">
+<!-- BOTTOM NAV DOCK (Tinggi ditinggikan h-20, ikon & kotak tombol diperbesar) -->
+<nav id="bottomNav" class="fixed bottom-0 left-0 right-0 h-20 bg-emerald-deep border-t border-emerald-medium/40 shadow-2xl z-[200] flex items-center justify-around px-2 pb-2">
   <div class="nav-it flex flex-col items-center justify-center w-20 h-full cursor-pointer transition-all duration-300" id="nRekap" onclick="navKlik(this,'rekap');event.stopPropagation()">
-    <div class="ic-wrap w-9 h-9 rounded-xl bg-emerald-medium/50 border border-white/20 flex items-center justify-center text-white transition-all">
-      <i class="fa-solid fa-chart-pie text-xs"></i>
+    <div class="ic-wrap w-11 h-11 rounded-xl bg-emerald-medium/50 border border-white/20 flex items-center justify-center text-white transition-all shadow-sm">
+      <i class="fa-solid fa-chart-pie text-sm"></i>
     </div>
-    <span class="text-[9px] font-bold text-white mt-1">Rekap</span>
+    <span class="text-[10px] font-bold text-white mt-1">Rekap</span>
   </div>
 
   <div class="nav-it flex flex-col items-center justify-center w-20 h-full cursor-pointer transition-all duration-300" id="nOffline" onclick="navKlik(this,'offline');event.stopPropagation()">
-    <div class="ic-wrap w-9 h-9 rounded-xl bg-emerald-medium/50 border border-white/20 flex items-center justify-center text-white transition-all">
-      <i class="fa-solid fa-database text-xs"></i>
+    <div class="ic-wrap w-11 h-11 rounded-xl bg-emerald-medium/50 border border-white/20 flex items-center justify-center text-white transition-all shadow-sm">
+      <i class="fa-solid fa-database text-sm"></i>
     </div>
-    <span class="text-[9px] font-bold text-white mt-1">Offline</span>
+    <span class="text-[10px] font-bold text-white mt-1">Offline</span>
   </div>
 
   <div class="nav-it flex flex-col items-center justify-center w-20 h-full cursor-pointer transition-all duration-300" id="nPengaturan" onclick="navKlik(this,'pengaturan');event.stopPropagation()">
-    <div class="ic-wrap w-9 h-9 rounded-xl bg-emerald-medium/50 border border-white/20 flex items-center justify-center text-white transition-all">
-      <i class="fa-solid fa-gear text-xs"></i>
+    <div class="ic-wrap w-11 h-11 rounded-xl bg-emerald-medium/50 border border-white/20 flex items-center justify-center text-white transition-all shadow-sm">
+      <i class="fa-solid fa-gear text-sm"></i>
     </div>
-    <span class="text-[9px] font-bold text-white mt-1">Pengaturan</span>
+    <span class="text-[10px] font-bold text-white mt-1">Pengaturan</span>
   </div>
 </nav>
 
@@ -559,7 +559,7 @@ function nyalakanKamera() {
   setTimeout(() => {
     html5QrCode.start(
       { facingMode: "environment" },
-      { fps: 20, qrbox: { width: 220, height: 220 } },
+      { fps: 20, qrbox: { width: 240, height: 240 } },
       handleScan
     ).catch(e => {
       if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
