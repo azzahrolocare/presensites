@@ -117,7 +117,7 @@
 
 <div>
     <!-- STATUS TOAST -->
-    <div id="status-kirim" class="fixed top-20 left-1/2 -translate-x-1/2 w-[88%] max-w-[400px] p-4 rounded-2xl z-[700] hidden text-white text-center font-bold text-xs shadow-xl backdrop-blur-md border border-white/20"></div>
+    <div id="status-kirim" class="fixed top-28 left-1/2 -translate-x-1/2 w-[88%] max-w-[400px] p-4 rounded-2xl z-[700] hidden text-white text-center font-bold text-xs shadow-xl backdrop-blur-md border border-white/20"></div>
 
     <!-- ABOUT OVERLAY -->
     <div id="about-overlay" class="hidden fixed inset-0 bg-black/72 z-[550]" onclick="closeAbout()"></div>
@@ -141,23 +141,38 @@
       </div>
     </div>
 
-    <!-- TOP NAV -->
-    <nav class="sticky top-0 z-40 bg-emerald-deep text-white px-4 py-3 shadow-md border-b border-emerald-medium/30">
-      <div class="max-w-7xl mx-auto flex items-center justify-center gap-4">
-        <img src="https://azzahro.web.id/presensi/logo-smp-azzahro.png" alt="SMP" class="w-10 h-10 object-contain rounded-lg flex-shrink-0">
-        <div class="text-center">
-          <h1 class="font-serif-custom text-sm font-bold tracking-wide">PRESENSI DIGITAL</h1>
-          <p class="text-[10px] uppercase font-medium tracking-wider text-gold-accent">SMP Islam Az-Zahro • SMK Az-Zahro</p>
+    <!-- TOP NAV (HEADER DITINGGIKAN + LAYOUT JAM TERPISAH DENGAN TANGGAL) -->
+    <nav class="sticky top-0 z-40 bg-emerald-deep text-white px-4 py-5 shadow-lg border-b border-emerald-medium/30">
+      <div class="max-w-7xl mx-auto flex flex-col items-center justify-center gap-2">
+        
+        <!-- Baris Atas: Logo & Judul Utama -->
+        <div class="flex items-center justify-center gap-4 w-full">
+          <img src="https://azzahro.web.id/presensi/logo-smp-azzahro.png" alt="SMP" class="w-11 h-11 object-contain rounded-lg flex-shrink-0 shadow-sm">
+          <div class="text-center">
+            <h1 class="font-serif-custom text-base font-bold tracking-wide">PRESENSI DIGITAL</h1>
+            <p class="text-[10px] uppercase font-medium tracking-wider text-gold-accent">SMP Islam Az-Zahro • SMK Az-Zahro</p>
+          </div>
+          <img src="https://azzahro.web.id/presensi/logo-smk-azzahro.png" alt="SMK" class="w-11 h-11 object-contain rounded-lg flex-shrink-0 shadow-sm">
         </div>
-        <img src="https://azzahro.web.id/presensi/logo-smk-azzahro.png" alt="SMK" class="w-10 h-10 object-contain rounded-lg flex-shrink-0">
+
+        <!-- Baris Bawah: Jam Digital & Tanggal Terpisah dengan Font Bagus -->
+        <div class="w-full pt-2 border-t border-emerald-medium/40 flex flex-col items-center justify-center">
+          <div id="header-time" class="font-serif-custom text-xl font-bold tracking-widest text-gold-accent drop-shadow-sm leading-none">
+            00:00:00
+          </div>
+          <div id="header-date" class="text-[10px] font-medium tracking-wider text-emerald-light uppercase mt-1">
+            Minggu, 1 Januari 2026
+          </div>
+        </div>
+
       </div>
     </nav>
 
     <!-- MAIN CONTENT -->
-    <div class="w-full max-w-md mx-auto p-4 flex flex-col gap-4 mt-2 pb-24">
+    <div class="w-full max-w-md mx-auto p-4 flex flex-col gap-4 mt-2 pb-24 items-center">
 
         <!-- DROPDOWN KETERANGAN -->
-        <div class="relative">
+        <div class="relative w-full">
           <select id="keterangan" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs text-gray-900 font-bold focus:ring-4 focus:ring-emerald-deep/5 focus:border-emerald-deep outline-none cursor-pointer shadow-sm">
             <option value="" disabled selected>Pilih Keterangan</option>
             <option value="●">🟢 HADIR</option>
@@ -167,14 +182,14 @@
           </select>
         </div>
 
-        <!-- SCANNER BOX -->
-        <div class="w-full h-72 rounded-2xl overflow-hidden border-2 border-emerald-deep shadow-lg bg-black relative flex items-center justify-center">
+        <!-- SCANNER BOX (PERSEGI ASR / ASPECT SQUARE) -->
+        <div class="w-full max-w-sm aspect-square rounded-2xl overflow-hidden border-2 border-emerald-deep shadow-lg bg-black relative flex items-center justify-center">
           <div id="reader" class="w-full h-full absolute inset-0"></div>
           <div id="selection-overlay" class="absolute inset-0 bg-black/90 z-[100] hidden flex-col items-center justify-center gap-2 p-4"></div>
         </div>
 
         <!-- NAMA TERAKHIR -->
-        <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100 flex items-center gap-3">
+        <div class="w-full bg-white rounded-xl p-3 shadow-sm border border-slate-100 flex items-center gap-3">
           <div class="w-10 h-10 rounded-lg bg-emerald-soft border border-emerald-light flex items-center justify-center flex-shrink-0">
             <i class="fa-solid fa-id-card text-emerald-deep text-sm"></i>
           </div>
@@ -282,6 +297,37 @@
 <script>
 let activeModal = null;
 const navState = {};
+
+// SCRIPT JAM REALTIME DENGAN FORMAT TANGGAL INDONESIA
+function updateClock() {
+  const now = new Date();
+  
+  // Format Jam
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  const timeStr = `${hours}:${minutes}:${seconds}`;
+  
+  // Format Tanggal
+  const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+  
+  const dayName = days[now.getDay()];
+  const dateNum = now.getDate();
+  const monthName = months[now.getMonth()];
+  const yearNum = now.getFullYear();
+  
+  const dateStr = `${dayName}, ${dateNum} ${monthName} ${yearNum}`;
+
+  const elTime = document.getElementById('header-time');
+  const elDate = document.getElementById('header-date');
+  
+  if (elTime) elTime.textContent = timeStr;
+  if (elDate) elDate.textContent = dateStr;
+}
+
+setInterval(updateClock, 1000);
+updateClock();
 
 function navKlik(el, aksi) {
   const id = el.id;
@@ -506,7 +552,7 @@ function nyalakanKamera() {
   setTimeout(() => {
     html5QrCode.start(
       { facingMode: "environment" },
-      { fps: 20, qrbox: { width: 260, height: 260 } },
+      { fps: 20, qrbox: { width: 240, height: 240 } },
       handleScan
     ).catch(e => {
       if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
