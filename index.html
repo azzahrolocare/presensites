@@ -153,7 +153,7 @@
       </div>
     </div>
 
-    <!-- TOP NAV (Header diperluas dengan paddingTop lebih besar agar aman dari kamera/poni HP) -->
+    <!-- TOP NAV Header (Padding Atas Diperluas) -->
     <nav class="sticky top-0 z-40 bg-emerald-deep text-white px-4 pt-7 pb-5 shadow-lg border-b border-emerald-medium/30">
       <div class="max-w-7xl mx-auto flex flex-col items-center justify-center gap-2">
         
@@ -195,7 +195,7 @@
           </select>
         </div>
 
-        <!-- SCANNER BOX (PERSEGI 1:1 DENGAN UKURAN LEBIH BESAR & SIKU-SIKU PUTIH) -->
+        <!-- SCANNER BOX (PERSEGI 1:1 DENGAN SIKU-SIKU PUTIH) -->
         <div class="w-full max-w-[350px] aspect-square rounded-2xl overflow-hidden border-2 border-emerald-deep shadow-lg bg-black relative flex items-center justify-center">
           <!-- Siku-siku Putih -->
           <div class="corner-bracket corner-tl"></div>
@@ -221,7 +221,7 @@
     </div>
 </div>
 
-<!-- BOTTOM NAV DOCK (Tinggi ditinggikan h-20, ikon & kotak tombol diperbesar) -->
+<!-- BOTTOM NAV DOCK (Tinggi Ditinggikan, Ikon Navigasi Diperbesar & 1-Klik) -->
 <nav id="bottomNav" class="fixed bottom-0 left-0 right-0 h-20 bg-emerald-deep border-t border-emerald-medium/40 shadow-2xl z-[200] flex items-center justify-around px-2 pb-2">
   <div class="nav-it flex flex-col items-center justify-center w-20 h-full cursor-pointer transition-all duration-300" id="nRekap" onclick="navKlik(this,'rekap');event.stopPropagation()">
     <div class="ic-wrap w-11 h-11 rounded-xl bg-emerald-medium/50 border border-white/20 flex items-center justify-center text-white transition-all shadow-sm">
@@ -555,11 +555,12 @@ function onCordovaReady() {
   }
 }
 
+// PERUBAHAN UTAMA: Ukuran qrbox diatur menjadi persegi sempurna (width = 250, height = 250)
 function nyalakanKamera() {
   setTimeout(() => {
     html5QrCode.start(
       { facingMode: "environment" },
-      { fps: 20, qrbox: { width: 240, height: 240 } },
+      { fps: 20, qrbox: { width: 250, height: 250 } }, // PERSEGI 1:1
       handleScan
     ).catch(e => {
       if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
